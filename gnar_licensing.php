@@ -24,6 +24,7 @@ define( 'GNRL_GNAR_API_LICENCE_ROUTE',           '/licence'  );
 define( 'GNRL_CSS_DIR',                          plugin_dir_url( __FILE__ ) . '/css' );
 
 include_once( GNRL_ADMIN_DIR . '/gnar_licensing_options_view.php' );
+include_once( GNRL_LIB_DIR   . '/gnar_woocom.php' );
 
 
 class gnar_licensing {
@@ -33,7 +34,10 @@ class gnar_licensing {
         // admin pages
         add_action( 'admin_menu', [$this, 'adminPages'] );
         add_action( 'admin_enqueue_scripts', [$this, 'adminScripts'] );
-        
+
+        // classes
+        new gnar_woocom();
+
     }
 
 
