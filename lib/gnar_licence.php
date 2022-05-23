@@ -22,8 +22,9 @@ class gnar_licence {
      */
     public function createLicence() {
 
+        gnar_api::postRequest();
+
         // handle errors
-        
     }
 
 
@@ -57,7 +58,7 @@ class gnar_licence {
      */
 
     public function getLicence($licenceKey) {
-        
+
     }
 
 

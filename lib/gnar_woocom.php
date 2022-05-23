@@ -36,6 +36,13 @@ class gnar_woocom {
             'value' => get_post_meta( $post_id, 'gnar_licencing_enable_prod', true )
         ));
 
+        woocommerce_wp_text_input( array(
+            'id'          => 'gnar_licencing_software_id',
+            'label'       => 'Software ID',
+            'placeholder' => 'e.g. my_example_wp_plugin',
+            'value'       => get_post_meta( $post_id, 'gnar_licencing_software_id', true )
+        ));
+
         echo '</div>';
     
     }
@@ -48,6 +55,9 @@ class gnar_woocom {
 
         if (isset($_POST['gnar_licencing_enable_prod'])) {
             update_post_meta( $post_id, 'gnar_licencing_enable_prod', $_POST['gnar_licencing_enable_prod'] );
+        }
+        if (isset($_POST['gnar_licencing_software_id'])) {
+            update_post_meta( $post_id, 'gnar_licencing_software_id', $_POST['gnar_licencing_software_id'] );
         }
 
     }
@@ -80,14 +90,26 @@ class gnar_woocom {
                 break;
             }
 
+            // get software id
+            $softwareID = get_post_meta($item->ID, 'gnar_licencing_software_id', true);
+
+            if (isempty($softwareID)) {
+                break;
+            }
+
             // generate licence
             $gnar_licence = new gnar_licence();
-            $gnar_licence->createLicence();
+            $createSuccess = $gnar_licence->createLicence();
 
             // save licence to order notes
-            
+            if ($createSuccess) {
+
+            }
 
             // handle errors
+            if (!$createSuccess) {
+
+            }
 
 
         }
