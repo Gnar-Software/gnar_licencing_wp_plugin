@@ -2,7 +2,7 @@
 
 Create and manage Gnar licences
 
---Features--
+## Features
 
 - create licence upon woocom plugin purchase
     - customer email is sent and stored
