@@ -7,16 +7,16 @@ class gnar_api {
      * 
      * @return string token
      */
-    private function authenticate() {
+    private static function authenticate() {
 
         if (!session_id()) {
             session_start();
         }
 
         // check if token already exists
-        $token = $_SESSION['gnar_licensing_api_token'];
+        if (!empty($_SESSION['gnar_licensing_api_token'])) {
+            $token = $_SESSION['gnar_licensing_api_token'];
 
-        if (!empty($token)) {
             return $token;
         }
 
@@ -51,7 +51,9 @@ class gnar_api {
         $response = curl_exec($ch);
         curl_close($ch);
 
-        $token = $response->token;
+        $responseObj = json_decode($response);
+
+        $token = $responseObj->token;
         $_SESSION['gnar_licensing_api_token'] = $token;
 
         return $token;
@@ -69,11 +71,13 @@ class gnar_api {
     public static function getRequest($params, $route) {
         $response = '';
 
-        $token = $this->authenticate();
+        $token = gnar_api::authenticate();
+
+        echo 'token: ' . $token; // test
 
         if (empty($token)) {
             return (object) [
-                'error' => 'could not authenticate with the gnar api'
+                'error' => 'could not authenticate with the gnar api, please ensure you have entered your API key in the settings page'
             ];
         }
 
@@ -87,7 +91,7 @@ class gnar_api {
         $ch = curl_init($URI);
 
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($ch, CURLOP_CUSTOMREQUEST, 'GET');
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
 
@@ -108,7 +112,7 @@ class gnar_api {
     public static function postRequest($body, $route) {
         $response = '';
 
-        $token = $this->authenticate();
+        $token = gnar_api::authenticate();
 
         if (empty($token)) {
             return (object) [

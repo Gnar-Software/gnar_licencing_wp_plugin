@@ -7,6 +7,8 @@ class gnar_woocom {
         $this->addProductFields();
         $this->addPurchaseHooks();
 
+        // todo add subscription status change hook
+
     }
 
 
@@ -81,6 +83,9 @@ class gnar_woocom {
         $order = wc_get_order($order_id);
         $items = $order->get_items();
 
+        // customer email
+        $customerEmail = $orde->get_billing_email();
+
         foreach ($items as $item) {
 
             // check if item is gnar licensing enabled
@@ -97,20 +102,22 @@ class gnar_woocom {
                 break;
             }
 
+            // woocom subscription status / todo
+            $status = 'active';
+
             // generate licence
-            $gnar_licence = new gnar_licence();
-            $createSuccess = $gnar_licence->createLicence();
+            $licence = gnar_licence::createLicence($customerEmail, $softwareID, $status);
 
-            // save licence to order notes
-            if ($createSuccess) {
+            // problem creating licence
+            if (empty($licence)) {
+                $order->add_order_note('Problem creating gnar licence');
 
+                return;
             }
 
-            // handle errors
-            if (!$createSuccess) {
-
-            }
-
+            // save licence to order
+            $order->add_order_note('Gnar licence key: ' . $licence->licenceKey);
+            add_post_meta($order_id, 'licence_key_' . $licence->softwareID, $licence->licenceKey);
 
         }
 

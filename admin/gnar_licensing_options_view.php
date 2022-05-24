@@ -15,7 +15,7 @@ class gnar_licensing_options_view {
     
         ?>
     
-        <div class="agencypriceadmin outercont wrap">
+        <div class="outercont wrap">
             <div class="innercont">
                 <div class="titlecont">
                     <h3>Gnar Licensing - Options</h3>
