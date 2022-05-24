@@ -20,7 +20,6 @@ define( 'GNRL_LIB_DIR',                          plugin_dir_path( __FILE__ ) . '
 define( 'GNRL_JS_DIR',                           plugin_dir_url( __FILE__ ) . 'js' );
 define( 'GNRL_ADMIN_DIR',                        plugin_dir_path( __FILE__ ) . 'admin' );
 define( 'GNRL_GNAR_API_URL',                     'https://api.gnar.co.uk/api' );
-define( 'GNRL_GNAR_API_LICENCE_ROUTE',           '/licence'  );
 define( 'GNRL_CSS_DIR',                          plugin_dir_url( __FILE__ ) . '/css' );
 
 include_once( GNRL_ADMIN_DIR . '/gnar_licensing_options_view.php' );
