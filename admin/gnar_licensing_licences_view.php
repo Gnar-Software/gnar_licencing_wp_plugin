@@ -30,7 +30,7 @@ class gnar_licensing_licences_view {
                     
                     ?>
 
-                    <table class="form-table gnar_manage_licences wp-list-table widefat fixed striped table-view-list">
+                    <table class="form-table gnar_manage_licences wp-list-table widefat striped table-view-list">
                         <thead>
                             <tr class="gnar_manage_headers">
                                 <th class="manage-column column-title" style="width: 40px">ID</th>

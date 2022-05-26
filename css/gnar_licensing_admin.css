@@ -3,3 +3,6 @@
     padding: 10px 0px 10px 0px;
     font-weight: 700;
 }
+.gnar_manage_headers th {
+    padding-left: 10px !important;
+}

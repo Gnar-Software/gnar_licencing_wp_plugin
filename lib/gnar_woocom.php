@@ -7,6 +7,11 @@ class gnar_woocom {
         $this->addProductFields();
         $this->addPurchaseHooks();
 
+        // todo display licence key and download link on order recieved page
+        add_action('woocommerce_thankyou', [$this, 'showKeyAndDownloadLink'], 10, 1);
+
+        // todo add licence key and download link to woocom email
+
         // todo add subscription status change hook
 
     }
@@ -98,7 +103,7 @@ class gnar_woocom {
             // get software id
             $softwareID = get_post_meta($item->ID, 'gnar_licencing_software_id', true);
 
-            if (isempty($softwareID)) {
+            if (empty($softwareID)) {
                 break;
             }
 
@@ -121,6 +126,55 @@ class gnar_woocom {
 
         }
 
+    }
+
+
+    /**
+     * Display licence key and download link on WC thank you page
+     */
+    public function showKeyAndDownloadLink($order_id) {
+
+        $order = wc_get_order($order_id);
+        $items = $order->get_items();
+
+        foreach ($items as $item) {
+            // check if item is gnar licensing enabled
+            $licensingEnabled = get_post_meta($item->ID, 'gnar_licencing_enable_prod', true);
+
+            if ($licensingEnabled !== 'yes') {
+                break;
+            }
+
+            $softwareID = get_post_meta($item->ID, 'gnar_licencing_software_id', true);
+
+            if (empty($softwareID)) {
+                break;
+            }
+
+            $licenceKey = get_post_meta($order_id, 'licence_key_' . $softwareID, true);
+
+            if (empty($licenceKey)) {
+                break;
+            }
+
+            $downloadLink = gnar_download::downloadLink($softwareID);
+
+            $this->keyAndDownloadMarkUp($licenceKey, $downloadLink);
+        }
+
+    }
+
+
+    /**
+     * Mark Up: Display licence key and download link on WC thank you page
+     */
+    public function keyAndDownloadMarkUp($licenceKey, $downloadLink) {
+        ?>
+        <div class="gnar_purchased_cont">
+            
+
+        </div>
+        <?php
     }
 
 }

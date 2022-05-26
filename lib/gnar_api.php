@@ -73,8 +73,6 @@ class gnar_api {
 
         $token = gnar_api::authenticate();
 
-        echo 'token: ' . $token; // test
-
         if (empty($token)) {
             return (object) [
                 'error' => 'could not authenticate with the gnar api, please ensure you have entered your API key in the settings page'
