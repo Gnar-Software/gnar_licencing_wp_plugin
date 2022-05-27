@@ -85,8 +85,6 @@ class gnar_woocom {
      */
     public function createLicence($order_id) {
 
-        error_log('got here');
-
         $order = wc_get_order($order_id);
         $items = $order->get_items();
 
@@ -142,8 +140,6 @@ class gnar_woocom {
      * Display licence key and download link on WC thank you page
      */
     public function showKeyAndDownloadLink($order_id) {
-
-        echo 'output hook fired';
 
         $order = wc_get_order($order_id);
         $items = $order->get_items();

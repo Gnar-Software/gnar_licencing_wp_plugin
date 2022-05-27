@@ -24,6 +24,7 @@ define( 'GNRL_CSS_DIR',                          plugin_dir_url( __FILE__ ) . 'c
 define( 'GNRL_ASSET_DIR',                          plugin_dir_url( __FILE__ ) . 'assets' );
 
 include_once( GNRL_LIB_DIR   . '/gnar_api.php' );
+include_once( GNRL_LIB_DIR   . '/gnar_download.php' );
 include_once( GNRL_LIB_DIR   . '/gnar_woocom.php' );
 include_once( GNRL_LIB_DIR   . '/gnar_licence.php' );
 include_once( GNRL_ADMIN_DIR . '/gnar_licensing_options_view.php' );
