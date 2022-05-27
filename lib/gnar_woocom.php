@@ -75,7 +75,7 @@ class gnar_woocom {
      */
     public function addPurchaseHooks() {
 
-        add_action( 'woocommerce_payment_complete', [$this, 'createLicence'], 10, 1 );
+        add_action( 'woocommerce_checkout_order_processed', [$this, 'createLicence'] );
 
     }
 
@@ -85,25 +85,34 @@ class gnar_woocom {
      */
     public function createLicence($order_id) {
 
+        error_log('got here');
+
         $order = wc_get_order($order_id);
         $items = $order->get_items();
 
         // customer email
-        $customerEmail = $orde->get_billing_email();
+        $customerEmail = $order->get_billing_email();
 
         foreach ($items as $item) {
 
+            $product = $item->get_product();
+            $productID = $product->get_id();
+
+            error_log('product id: ' . $productID);
+
             // check if item is gnar licensing enabled
-            $licensingEnabled = get_post_meta($item->ID, 'gnar_licencing_enable_prod', true);
+            $licensingEnabled = get_post_meta($productID, 'gnar_licencing_enable_prod', true);
 
             if ($licensingEnabled !== 'yes') {
+                error_log('licensing was not enabled on this product');
                 break;
             }
 
             // get software id
-            $softwareID = get_post_meta($item->ID, 'gnar_licencing_software_id', true);
+            $softwareID = get_post_meta($productID, 'gnar_licencing_software_id', true);
 
             if (empty($softwareID)) {
+                error_log('could not find software id for this product');
                 break;
             }
 
@@ -134,18 +143,24 @@ class gnar_woocom {
      */
     public function showKeyAndDownloadLink($order_id) {
 
+        echo 'output hook fired';
+
         $order = wc_get_order($order_id);
         $items = $order->get_items();
 
         foreach ($items as $item) {
+
+            $product = $item->get_product();
+            $productID = $product->get_id();
+
             // check if item is gnar licensing enabled
-            $licensingEnabled = get_post_meta($item->ID, 'gnar_licencing_enable_prod', true);
+            $licensingEnabled = get_post_meta($productID, 'gnar_licencing_enable_prod', true);
 
             if ($licensingEnabled !== 'yes') {
                 break;
             }
 
-            $softwareID = get_post_meta($item->ID, 'gnar_licencing_software_id', true);
+            $softwareID = get_post_meta($productID, 'gnar_licencing_software_id', true);
 
             if (empty($softwareID)) {
                 break;
@@ -154,12 +169,13 @@ class gnar_woocom {
             $licenceKey = get_post_meta($order_id, 'licence_key_' . $softwareID, true);
 
             if (empty($licenceKey)) {
+                echo 'There was problem generating your licence key.';
                 break;
             }
 
             $downloadLink = gnar_download::downloadLink($softwareID);
 
-            $this->keyAndDownloadMarkUp($licenceKey, $downloadLink);
+            $this->keyAndDownloadMarkUp($licenceKey, $downloadLink, $softwareID);
         }
 
     }
@@ -168,10 +184,21 @@ class gnar_woocom {
     /**
      * Mark Up: Display licence key and download link on WC thank you page
      */
-    public function keyAndDownloadMarkUp($licenceKey, $downloadLink) {
+    public function keyAndDownloadMarkUp($licenceKey, $downloadLink, $softwareID) {
         ?>
         <div class="gnar_purchased_cont">
-            
+            <div>
+                <label>Licence key: </label>
+                <span><?= $licenceKey ?></span>
+            </div>
+
+            <p>Your licence key has been emailed to you. Please click the link below to download your purchased software.</p>
+
+            <div class="gnar_download_link_cont">
+                <a href="<?= $downloadLink ?>">Click here to download <?= $softwareID ?></a>
+            </div>
+
+            <p>You will be able to re-download your purchased software at any time from your <a href="/shop/my-account/">account page</a>.</p>
 
         </div>
         <?php

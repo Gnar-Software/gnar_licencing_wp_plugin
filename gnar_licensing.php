@@ -49,7 +49,7 @@ class gnar_licensing {
      */
     public function adminPages() {
 
-        $gnarLicencingAdminOptions = add_menu_page( 'Gnar Licensing', 'Gnar Licensing', 'manage_options', 'gnar_licensing_options', ['gnar_licensing_options_view', 'gnarLicensingOptionsView'], GNRL_ASSET_DIR . 'gnar.png', 99 );
+        $gnarLicencingAdminOptions = add_menu_page( 'Gnar Licensing', 'Gnar Licensing', 'manage_options', 'gnar_licensing_options', ['gnar_licensing_options_view', 'gnarLicensingOptionsView'], GNRL_ASSET_DIR . '/gnar.png', 99 );
         $gnarLicencingAdminOptions = add_submenu_page( 'gnar_licensing_options', 'Settings', 'Settings', 'manage_options', 'gnar_licensing_options', ['gnar_licensing_options_view', 'gnarLicensingOptionsView'], 1);
         $gnarLicencingAdminManage  = add_submenu_page( 'gnar_licensing_options', 'Manage licences', 'Manage licences', 'manage_options', 'gnar_licensing_manage', ['gnar_licensing_licences_view', 'gnarLicensingLicencesView'], 1);
 
