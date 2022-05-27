@@ -17,3 +17,10 @@ Create and manage Gnar licences
 - upon wc_activation status change to failed/expired api is updated
 
 - admin page display all licences
+
+
+## To do
+
+- enqueue front end style
+- my account page (show all software associated with email (licence key, software, version, download link, domain))
+- attach subscription status to licence status

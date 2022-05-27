@@ -42,6 +42,9 @@ class gnar_licensing {
         // classes
         new gnar_woocom();
 
+        // front end style
+        
+
     }
 
 
