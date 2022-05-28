@@ -44,7 +44,7 @@ class gnar_licensing {
 
         // front end style
         
-
+        
     }
 
 

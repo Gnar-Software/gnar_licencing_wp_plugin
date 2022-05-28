@@ -194,10 +194,54 @@ class gnar_woocom {
                 <a href="<?= $downloadLink ?>">Click here to download <?= $softwareID ?></a>
             </div>
 
-            <p>You will be able to re-download your purchased software at any time from your <a href="/shop/my-account/">account page</a>.</p>
+            <p>You will be able to re-download your purchased software at any time from your <a href="/my-account/">account page</a>.</p>
 
         </div>
         <?php
+    }
+
+
+    /**
+     * Get available downloads/licences for the users my account page
+     * 
+     * @param int $user_id
+     * @return array $downloads (array of objects)
+     */
+
+    public static function getDownloads($user_id) {
+        $downloads = [];
+
+        $userData = get_userdata($user_id);
+        $email = $userData->user_email;
+
+        // get all licences associated with this email address
+        $licences = gnar_licence::getUserLicence($email);
+
+        // get product data and generate response object
+        foreach ($licences as $licence) {
+
+            // get product from softwareID
+            $args = array(
+                'post_type' => 'product',
+                'meta_key' => 'gnar_licencing_software_id',
+                'meta_value' => $licence->software_id
+            );
+
+            $products = wc_get_products($args);
+            $product = $products[0];
+
+            $downloadObj = (object) [
+                'imageUrl'     =>  
+                'productName'  =>
+                'productDesc'  =>
+                'licenceKey'   =>
+                'domain'       =>
+                'downloadLink' =>
+            ];
+
+        }
+
+        return $downloads;
     }
 
 }

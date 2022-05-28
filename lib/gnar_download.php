@@ -16,7 +16,6 @@ class gnar_download {
         return $downloadLink;
     }
 
-
     /**
      * Get single use download token
      * 
