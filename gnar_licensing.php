@@ -42,8 +42,9 @@ class gnar_licensing {
         // classes
         new gnar_woocom();
 
-        // front end style
-        
+        // front end
+        add_action( 'wp_enqueue_scripts', [$this, 'clientStyles'] );
+        add_action( 'wp_enqueue_scripts', [$this, 'clientScripts'] );
         
     }
 
@@ -80,6 +81,25 @@ class gnar_licensing {
     public function adminScripts() {
 
         wp_enqueue_script( 'gnar_licensing_admin', GNRL_JS_DIR . '/gnar_licensing_admin.js', array(), '' );
+
+    }
+
+
+    /**
+     * Front end styles
+     */
+    public function clientStyles() {
+
+        wp_register_style( 'gnar_licensing_client_style', GNRL_CSS_DIR . '/gnar_licensing_client.css', false, '' );
+        wp_enqueue_style( 'gnar_licensing_client_style' );
+
+    }
+
+
+    /**
+     * Front end scripts
+     */
+    public function clientScripts() {
 
     }
 

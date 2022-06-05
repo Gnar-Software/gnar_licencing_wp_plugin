@@ -10,6 +10,9 @@ class gnar_woocom {
         // todo display licence key and download link on order recieved page
         add_action('woocommerce_thankyou', [$this, 'showKeyAndDownloadLink'], 10, 1);
 
+        // my account page
+        $this->setupMyAccountPage();
+
         // todo add licence key and download link to woocom email
 
         // todo add subscription status change hook
@@ -207,7 +210,6 @@ class gnar_woocom {
      * @param int $user_id
      * @return array $downloads (array of objects)
      */
-
     public static function getDownloads($user_id) {
         $downloads = [];
 
@@ -224,25 +226,134 @@ class gnar_woocom {
             $args = array(
                 'post_type' => 'product',
                 'meta_key' => 'gnar_licencing_software_id',
-                'meta_value' => $licence->software_id
+                'meta_value' => $licence->softwareID
             );
 
             $products = wc_get_products($args);
             $product = $products[0];
 
+            // form download obj
             $downloadObj = (object) [
-                'imageUrl'     =>  
-                'productName'  =>
-                'productDesc'  =>
-                'licenceKey'   =>
-                'domain'       =>
-                'downloadLink' =>
+                'imageUrl'     =>  wp_get_attachment_url(get_post_thumbnail_id($product->get_id())),
+                'productName'  =>  $product->get_title(),
+                'productDesc'  =>  $product->get_description(),
+                'licenceKey'   =>  $licence->licenceKey,
+                'domain'       =>  $licence->domain,
+                'downloadLink' =>  gnar_download::downloadLink($licence->softwareID)
             ];
 
+            // add to array
+            array_push($downloads, $downloadObj);
         }
 
         return $downloads;
     }
+
+
+    /**
+     * Setup My account page
+     */
+    public function setupMyAccountPage() {
+
+        // add link to menu items & remove wc downloads item
+        add_filter ( 'woocommerce_account_menu_items', [$this, 'addMyAccountMenuItem'], 10 );
+
+        // register permalink
+        add_action( 'init', [$this, 'addMyAccountEndpoint'] );
+
+        // page content
+        add_action( 'woocommerce_account_my-licences_endpoint', [$this, 'myLicencesPage'] );
+
+    }
+
+
+    /**
+     * Add my account menu item & remove wc downloads item
+     */
+    public function addMyAccountMenuItem($menuItems) {
+
+        $menuItems['my-licences'] = 'Licences / Downloads';
+        unset($menuItems['downloads']);
+
+        return $menuItems;
+    }
+
+
+    /**
+     * Add my account page endpoint
+     */
+    public function addMyAccountEndpoint() {
+
+        add_rewrite_endpoint( 'my-licences', EP_PAGES );
+
+    }
+
+
+    /**
+     * My licences page mark up
+     */
+    public function myLicencesPage() {
+
+        // wc subscriptions are active
+        $wcSubscriptionsExists = false;
+        // if( !is_plugin_active( 'woocommerce-subscriptions/woocommerce-subscriptions.php' ) ) {
+        //     $wcSubscriptionsExists = true;
+        // }
+
+        // get users available downloads
+        $user = wp_get_current_user();
+        $downloads = gnar_woocom::getDownloads($user->ID);
+
+        $has_downloads = false;
+        if (!empty($downloads)) {
+            $has_downloads = true;
+        }
+
+        if (!empty($downloads)) : ?> 
+
+        <?php foreach ($downloads as $downloadObj) {
+        ?>
+            <div class="account_gnar_download_outer">
+                <div class="gnar_col left">
+                    <img src="<?= $downloadObj->imageUrl ?>" />
+                </div>
+                <div class="gnar_col right">
+                    <h3><?= $downloadObj->productName ?></h3>
+                    <p><?= $downloadObj->productDesc ?></p>
+                    <div class="gnar_col_right_inner">
+                        <form id="gnar_download_form" data-key="<?= $downloadObj->licenceKey ?>">
+                            <p>
+                                <label>Licence key:</label>
+                                <span><?= $downloadObj->licenceKey ?></span>
+                            </p>
+                            <p>
+                                <label>Registered domain:</label>
+                                <input type="text" name="registered_domain" data-key="<?= $downloadObj->licenceKey ?>" value="<?= $downloadObj->domain ?>" />
+                                <button class="update_domain" data-key="<?= $downloadObj->licenceKey ?>" id="domain_update_<?= $downloadObj->licenceKey ?>">Update</button>
+                            </p>
+                            <p>
+                                <label>Download link:</label>
+                                <a href="<?= $downloadObj->downloadLink ?>" class="gnar_download_btn">Download Latest Version</a>
+                            </p>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+        <?php
+        }
+        ?>
+
+        <?php else : ?> 
+        <div class="woocommerce-Message woocommerce-Message--info woocommerce-info"> 
+            <a class="woocommerce-Button button" href="<?php echo esc_url( apply_filters( 'woocommerce_return_to_shop_redirect', wc_get_page_permalink( 'shop' ) ) ); ?>"> 
+                <?php esc_html_e( 'Go shop', 'woocommerce' ) ?> 
+            </a> 
+            <?php esc_html_e( 'No downloads available yet.', 'woocommerce' ); ?> 
+        </div> 
+        <?php endif;
+    }
+
 
 }
 

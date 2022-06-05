@@ -112,8 +112,44 @@ class gnar_licence {
     /**
      * Get users licences
      */
-    public function getUserLicence($email) {
+    public static function getUserLicence($email) {
+        $licences = [];
 
+        // get all licenses
+        $response = gnar_api::getRequest(
+            $params = null,
+            $route = '/licence/user/' . $email
+        );
+
+        if (empty($response)) {
+            return (object) [
+                'error' => 'an unknown error has occured'
+            ];
+        }
+
+        if (!empty($response->error)) {
+            return $response;
+        }
+
+        foreach ($response->licences as $respLicence) {
+            $licence = new gnar_licence();
+
+            (isset($respLicence->id))             ? $licence->licenceID = $respLicence->id : $licence->licenceID = '';
+            (isset($respLicence->licence_key))    ? $licence->licenceKey = $respLicence->licence_key : $licence->licenceKey = '';
+            (isset($respLicence->customer_email)) ? $licence->customerEmail = $respLicence->customer_email : $licence->customerEmail = '';
+            (isset($respLicence->software_id))    ? $licence->softwareID = $respLicence->software_id : $licence->softwareID = '';
+            (isset($respLicence->status))         ? $licence->status = $respLicence->status : $licence->status = '';
+            (isset($respLicence->domain))         ? $licence->domain = $respLicence->domain : $licence->domain = '';
+            (isset($respLicence->created_at))     ? $licence->createdDate = $respLicence->created_at : $licence->createdDate = '';
+            (isset($respLicence->last_verified))  ? $licence->lastVerificationDate = $respLicence->last_verified : $licence->lastVerificationDate = '';
+
+            // todo - get order id from woocom
+            $licence->orderID = '';
+
+            array_push($licences, $licence);
+        }
+
+        return $licences;
     }
 
 

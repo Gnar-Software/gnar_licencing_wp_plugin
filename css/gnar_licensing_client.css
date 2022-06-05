@@ -1,3 +1,4 @@
+/* order recieved */
 .gnar_purchased_cont {
     text-align: center;
     border: 1px solid rgb(215,215,215);
@@ -9,3 +10,55 @@
     margin-bottom: 20px;
     font-size: 16px;
 }
+/* END order recieved */
+/* my account */
+.account_gnar_download_outer {
+    display: flex;
+    border: 1px solid rgba(0,0,0,0.2);
+    margin-bottom: 30px;
+}
+.account_gnar_download_outer h3 {
+    margin-top: 0px !important;
+    margin-bottom: 10px !important;
+}
+.account_gnar_download_outer p {
+    display: flex;
+    flex-wrap: wrap;
+}
+.account_gnar_download_outer p label {
+    margin-right: 10px;
+    font-weight: 700;
+}
+.account_gnar_download_outer p input[type="text"] {
+    max-width: 50%;
+    padding: 5px;
+}
+.gnar_col.left {
+    min-width: 35% !important;
+    width: 35% !important;
+    max-width: 35% !important;
+}
+.gnar_col {
+    padding: 20px;
+}
+.gnar_tip {
+    font-size: 14px;
+}
+.update_domain {
+    padding: 5px;
+    margin-left: 10px;
+    text-decoration: none !important;
+    text-transform: none;
+}
+
+@media (max-width: 1100px) {
+    .account_gnar_download_outer {
+        display: block;
+    }
+    .gnar_col.left {
+        min-width: 100% !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+}
+/* END my account */

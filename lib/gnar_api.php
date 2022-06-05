@@ -9,7 +9,7 @@ class gnar_api {
      */
     private static function authenticate() {
 
-        if (!session_id()) {
+        if (!session_id() && !headers_sent()) {
             session_start();
         }
 
