@@ -42,10 +42,11 @@ class gnar_licensing {
         // classes
         new gnar_woocom();
 
-        // front end
+        // front end scripts & styles
         add_action( 'wp_enqueue_scripts', [$this, 'clientStyles'] );
         add_action( 'wp_enqueue_scripts', [$this, 'clientScripts'] );
-        
+
+
     }
 
 
@@ -101,6 +102,14 @@ class gnar_licensing {
      */
     public function clientScripts() {
 
+        wp_enqueue_script( 'gnar_licensing_client', GNRL_JS_DIR . '/gnar_licensing_client.js', array(), '' );
+
+        $gnarClientVars = [
+            'ajax_url' => admin_url('admin-ajax.php'),
+            'security' => wp_create_nonce( 'gnar_security_nonce' )
+        ];
+
+        wp_localize_script( 'gnar_licensing_client', 'gnar_vars', $gnarClientVars );
     }
 
 }

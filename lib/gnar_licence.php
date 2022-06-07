@@ -43,19 +43,7 @@ class gnar_licence {
 
         $respLicence = $responseObj->licence;
 
-        $licence = new gnar_licence();
-
-        (isset($respLicence->id))             ? $licence->licenceID = $respLicence->id : $licence->licenceID = '';
-        (isset($respLicence->licence_key))    ? $licence->licenceKey = $respLicence->licence_key : $licence->licenceKey = '';
-        (isset($respLicence->customer_email)) ? $licence->customerEmail = $respLicence->customer_email : $licence->customerEmail = '';
-        (isset($respLicence->software_id))    ? $licence->softwareID = $respLicence->software_id : $licence->softwareID = '';
-        (isset($respLicence->status))         ? $licence->status = $respLicence->status : $licence->status = '';
-        (isset($respLicence->domain))         ? $licence->domain = $respLicence->domain : $licence->domain = '';
-        (isset($respLicence->created_at))     ? $licence->createdDate = $respLicence->created_at : $licence->createdDate = '';
-        (isset($respLicence->last_verified))  ? $licence->lastVerificationDate = $respLicence->last_verified : $licence->lastVerificationDate = '';
-
-        // todo - get order id from woocom
-        $licence->orderID = '';
+        $licence = gnar_licence::parseGnarLicence($respLicence);
 
         return $licence;
     }
@@ -87,19 +75,8 @@ class gnar_licence {
         }
 
         foreach ($response->licences as $respLicence) {
-            $licence = new gnar_licence();
 
-            (isset($respLicence->id))             ? $licence->licenceID = $respLicence->id : $licence->licenceID = '';
-            (isset($respLicence->licence_key))    ? $licence->licenceKey = $respLicence->licence_key : $licence->licenceKey = '';
-            (isset($respLicence->customer_email)) ? $licence->customerEmail = $respLicence->customer_email : $licence->customerEmail = '';
-            (isset($respLicence->software_id))    ? $licence->softwareID = $respLicence->software_id : $licence->softwareID = '';
-            (isset($respLicence->status))         ? $licence->status = $respLicence->status : $licence->status = '';
-            (isset($respLicence->domain))         ? $licence->domain = $respLicence->domain : $licence->domain = '';
-            (isset($respLicence->created_at))     ? $licence->createdDate = $respLicence->created_at : $licence->createdDate = '';
-            (isset($respLicence->last_verified))  ? $licence->lastVerificationDate = $respLicence->last_verified : $licence->lastVerificationDate = '';
-
-            // todo - get order id from woocom
-            $licence->orderID = '';
+            $licence = gnar_licence::parseGnarLicence($respLicence);
 
             array_push($licences, $licence);
         }
@@ -111,6 +88,9 @@ class gnar_licence {
 
     /**
      * Get users licences
+     * 
+     * @param string email
+     * @return array licences
      */
     public static function getUserLicence($email) {
         $licences = [];
@@ -132,19 +112,8 @@ class gnar_licence {
         }
 
         foreach ($response->licences as $respLicence) {
-            $licence = new gnar_licence();
 
-            (isset($respLicence->id))             ? $licence->licenceID = $respLicence->id : $licence->licenceID = '';
-            (isset($respLicence->licence_key))    ? $licence->licenceKey = $respLicence->licence_key : $licence->licenceKey = '';
-            (isset($respLicence->customer_email)) ? $licence->customerEmail = $respLicence->customer_email : $licence->customerEmail = '';
-            (isset($respLicence->software_id))    ? $licence->softwareID = $respLicence->software_id : $licence->softwareID = '';
-            (isset($respLicence->status))         ? $licence->status = $respLicence->status : $licence->status = '';
-            (isset($respLicence->domain))         ? $licence->domain = $respLicence->domain : $licence->domain = '';
-            (isset($respLicence->created_at))     ? $licence->createdDate = $respLicence->created_at : $licence->createdDate = '';
-            (isset($respLicence->last_verified))  ? $licence->lastVerificationDate = $respLicence->last_verified : $licence->lastVerificationDate = '';
-
-            // todo - get order id from woocom
-            $licence->orderID = '';
+            $licence = gnar_licence::parseGnarLicence($respLicence);
 
             array_push($licences, $licence);
         }
@@ -156,11 +125,57 @@ class gnar_licence {
     /**
      * Get licence by licence key
      */
-
     public function getLicence($licenceKey) {
 
     }
 
+
+    /**
+     * Update licenc by licence key
+     * 
+     * @param int id
+     * @param array args (updateable properties: domain, status, customer_email, software_id)
+     * @return bool success
+     */
+    public static function updateLicence($id, $args) {
+
+        $route = '/licence/update/' . $licenceKey;
+
+        $responseObj = gnar_api::postRequest($args, $route);
+
+        if (!empty($response->error)) {
+            error_log('error updating licence: ' . $response->error);
+            return false;
+        }
+
+        return true;
+    }
+
+
+    /**
+     * Construct licence object from api response
+     * 
+     * @param object response object
+     * @return gnar_licence licence
+     */
+    public static function parseGnarLicence($respLicence) {
+
+        $licence = new gnar_licence();
+
+        (isset($respLicence->id))             ? $licence->licenceID = $respLicence->id : $licence->licenceID = '';
+        (isset($respLicence->licence_key))    ? $licence->licenceKey = $respLicence->licence_key : $licence->licenceKey = '';
+        (isset($respLicence->customer_email)) ? $licence->customerEmail = $respLicence->customer_email : $licence->customerEmail = '';
+        (isset($respLicence->software_id))    ? $licence->softwareID = $respLicence->software_id : $licence->softwareID = '';
+        (isset($respLicence->status))         ? $licence->status = $respLicence->status : $licence->status = '';
+        (isset($respLicence->domain))         ? $licence->domain = $respLicence->domain : $licence->domain = '';
+        (isset($respLicence->created_at))     ? $licence->createdDate = $respLicence->created_at : $licence->createdDate = '';
+        (isset($respLicence->last_verified))  ? $licence->lastVerificationDate = $respLicence->last_verified : $licence->lastVerificationDate = '';
+
+        // todo - get order id from woocom
+        $licence->orderID = '';
+
+        return $licence;
+    }
 
 }
 

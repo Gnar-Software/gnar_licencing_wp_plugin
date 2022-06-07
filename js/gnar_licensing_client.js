@@ -8,7 +8,7 @@
                 e.preventDefault();
                 var key = $(this).data('key');
                 var domain = $(this).sibling('input[type=text]').first().val();
-               
+                
                 if (updateDomain(domain)) {
                     return true;
                 }
@@ -24,12 +24,16 @@
     /**
      * Update domain ajax
      * 
-     * @param {string} domain
+     * @param {let} licenceID
+     * @param {string} domain 
      */
-    function updateDomain(domain) {
+    function updateDomain(licenceID, domain) {
+
         var formData = new FormData();
         formData.append('action', 'updateDomain');
         formData.append('domain', domain);
+        formData.append('licenceID', licenceID);
+        formData.append('security', gnar_vars.security);
 
         $.ajax({
             type: 'POST',
