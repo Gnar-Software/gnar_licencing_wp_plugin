@@ -81,7 +81,7 @@ class gnar_licensing {
      */
     public function adminScripts() {
 
-        wp_enqueue_script( 'gnar_licensing_admin', GNRL_JS_DIR . '/gnar_licensing_admin.js', array(), '' );
+        wp_enqueue_script( 'gnar_licensing_admin', GNRL_JS_DIR . '/gnar_licensing_admin.js', array('jquery'), '' );
 
     }
 
@@ -102,7 +102,7 @@ class gnar_licensing {
      */
     public function clientScripts() {
 
-        wp_enqueue_script( 'gnar_licensing_client', GNRL_JS_DIR . '/gnar_licensing_client.js', array(), '' );
+        wp_enqueue_script( 'gnar_licensing_client', GNRL_JS_DIR . '/gnar_licensing_client.js', array('jquery'), '' );
 
         $gnarClientVars = [
             'ajax_url' => admin_url('admin-ajax.php'),

@@ -14,8 +14,8 @@ class gnar_woocom {
         $this->setupMyAccountPage();
 
         // ajax actions
-        add_action( 'wp_ajax_updateDomain', [$this, 'ajaxUpdateDomain'] );
-        add_action( 'wp_ajax_nopriv_updateDomain', [$this, 'ajaxUpdateDomain'] );
+        add_action( 'wp_ajax_updatedomain', [$this, 'ajaxUpdateDomain'] );
+        add_action( 'wp_ajax_nopriv_updatedomain', [$this, 'ajaxUpdateDomain'] );
 
 
         // todo add licence key and download link to woocom email
@@ -363,18 +363,20 @@ class gnar_woocom {
     /**
      * Ajax update domain
      */
-    public function ajaxUpdateDomain() {
+    public static function ajaxUpdateDomain() {
 
         if (!isset($_POST['security']) || !wp_verify_nonce( $_POST['security'], 'gnar_security_nonce' )) {
-            return json_encode( (object) [
+            echo json_encode( (object) [
                 'status' => 'unauthorised'
             ]);
+            die();
         }
 
         if (empty($_POST['domain']) || empty($_POST['licenceID'])) {
-            return json_encode( (object) [
+            echo json_encode( (object) [
                 'status' => 'invalid request'
             ]);
+            die();
         }
 
         $licenceID = strip_tags('licenceID');
@@ -383,14 +385,17 @@ class gnar_woocom {
         $success = gnar_licence::updateLicence($licenceID, $domain);
 
         if (!$success) {
-            return json_encode( (object) [
+            echo json_encode( (object) [
                 'status' => 'error'
             ]);
+            die();
         }
 
-        return json_encode( (object) [
+        echo json_encode( (object) [
             'status' => 'success'
         ]);
+
+        die();
 
     }
 
