@@ -134,17 +134,17 @@ class gnar_licence {
      * Update licenc by licence key
      * 
      * @param int id
-     * @param array args (updateable properties: domain, status, customer_email, software_id)
+     * @param object args (updateable properties: domain, status, customer_email)
      * @return bool success
      */
     public static function updateLicence($id, $args) {
 
-        $route = '/licence/update/' . $licenceKey;
+        $route = '/licence/update/' . $id;
 
         $responseObj = gnar_api::postRequest($args, $route);
 
-        if (!empty($response->error)) {
-            error_log('error updating licence: ' . $response->error);
+        if (!empty($response->message) && $response->message == 'no matching licence') {
+            error_log('error updating licence: ' . $response->message);
             return false;
         }
 

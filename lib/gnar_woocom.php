@@ -242,6 +242,7 @@ class gnar_woocom {
                 'imageUrl'     =>  wp_get_attachment_url(get_post_thumbnail_id($product->get_id())),
                 'productName'  =>  $product->get_title(),
                 'productDesc'  =>  $product->get_description(),
+                'licenceID'    =>  $licence->licenceID,
                 'licenceKey'   =>  $licence->licenceKey,
                 'domain'       =>  $licence->domain,
                 'downloadLink' =>  gnar_download::downloadLink($licence->softwareID)
@@ -326,15 +327,15 @@ class gnar_woocom {
                     <h3><?= $downloadObj->productName ?></h3>
                     <p><?= $downloadObj->productDesc ?></p>
                     <div class="gnar_col_right_inner">
-                        <form id="gnar_download_form" data-key="<?= $downloadObj->licenceKey ?>">
+                        <form id="gnar_download_form" data-licenceID="<?= $downloadObj->licenceID ?>">
                             <p>
                                 <label>Licence key:</label>
                                 <span><?= $downloadObj->licenceKey ?></span>
                             </p>
                             <p>
                                 <label>Registered domain:</label>
-                                <input type="text" name="registered_domain" data-key="<?= $downloadObj->licenceKey ?>" value="<?= $downloadObj->domain ?>" />
-                                <button class="update_domain" data-key="<?= $downloadObj->licenceKey ?>" id="domain_update_<?= $downloadObj->licenceKey ?>">Update</button>
+                                <input type="text" name="registered_domain" value="<?= $downloadObj->domain ?>" />
+                                <button class="update_domain" data-licenceid="<?= $downloadObj->licenceID ?>" id="domain_update_<?= $downloadObj->licenceKey ?>">Update</button>
                             </p>
                             <p>
                                 <label>Download link:</label>
@@ -374,15 +375,20 @@ class gnar_woocom {
 
         if (empty($_POST['domain']) || empty($_POST['licenceID'])) {
             echo json_encode( (object) [
-                'status' => 'invalid request'
+                'status' => 'invalid request',
+                'post'   => $_POST 
             ]);
             die();
         }
 
-        $licenceID = strip_tags('licenceID');
-        $domain = strip_tags('domain');
+        $licenceID = strip_tags($_POST['licenceID']);
+        $domain = strip_tags($_POST['domain']);
 
-        $success = gnar_licence::updateLicence($licenceID, $domain);
+        $args = (object) [
+            'domain' => $domain
+        ];
+
+        $success = gnar_licence::updateLicence($licenceID, $args);
 
         if (!$success) {
             echo json_encode( (object) [
