@@ -21,7 +21,7 @@ define( 'GNRL_JS_DIR',                           plugin_dir_url( __FILE__ ) . 'j
 define( 'GNRL_ADMIN_DIR',                        plugin_dir_path( __FILE__ ) . 'admin' );
 define( 'GNRL_GNAR_API_URL',                     'https://api.gnar.co.uk/api' );
 define( 'GNRL_CSS_DIR',                          plugin_dir_url( __FILE__ ) . 'css' );
-define( 'GNRL_ASSET_DIR',                          plugin_dir_url( __FILE__ ) . 'assets' );
+define( 'GNRL_ASSET_DIR',                        plugin_dir_url( __FILE__ ) . 'assets' );
 
 include_once( GNRL_LIB_DIR   . '/gnar_api.php' );
 include_once( GNRL_LIB_DIR   . '/gnar_download.php' );

@@ -123,15 +123,7 @@ class gnar_licence {
 
 
     /**
-     * Get licence by licence key
-     */
-    public function getLicence($licenceKey) {
-
-    }
-
-
-    /**
-     * Update licenc by licence key
+     * Update licence by licence ID
      * 
      * @param int id
      * @param object args (updateable properties: domain, status, customer_email)

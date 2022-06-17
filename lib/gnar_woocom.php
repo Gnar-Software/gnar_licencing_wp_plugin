@@ -20,7 +20,8 @@ class gnar_woocom {
 
         // todo add licence key and download link to woocom email
 
-        // todo add subscription status change hook
+        // add subscription status change hook
+        add_action( 'woocommerce_subscription_status_updated', [$this, 'subscriptionStatusUpdated'], 10, 3 );
 
     }
 
@@ -99,30 +100,20 @@ class gnar_woocom {
         // customer email
         $customerEmail = $order->get_billing_email();
 
-        foreach ($items as $item) {
+        foreach ($items as $itemID => $item) {
 
             $product = $item->get_product();
             $productID = $product->get_id();
 
-            error_log('product id: ' . $productID);
-
-            // check if item is gnar licensing enabled
+            // check if item is gnar licensing enabled and get software ID
             $licensingEnabled = get_post_meta($productID, 'gnar_licencing_enable_prod', true);
-
-            if ($licensingEnabled !== 'yes') {
-                error_log('licensing was not enabled on this product');
-                break;
-            }
-
-            // get software id
             $softwareID = get_post_meta($productID, 'gnar_licencing_software_id', true);
 
-            if (empty($softwareID)) {
-                error_log('could not find software id for this product');
+            if ($licensingEnabled !== 'yes' || empty($softwareID)) {
                 break;
             }
 
-            // woocom subscription status / todo
+            // assume wc subscription status is active straight away
             $status = 'active';
 
             // generate licence
@@ -138,6 +129,29 @@ class gnar_woocom {
             // save licence to order
             $order->add_order_note('Gnar licence key: ' . $licence->licenceKey);
             add_post_meta($order_id, 'licence_key_' . $licence->softwareID, $licence->licenceKey);
+
+            $order->add_order_note('Gnar licence ID: ' . $licence->licenceID);
+            add_post_meta($order_id, 'licence_id_' . $licence->softwareID, $licence->licenceID);
+
+            // save licence to subscription
+            $subscriptions = wcs_get_subscriptions_for_order($order_id);
+
+
+            if (!empty($subscriptions)) {
+
+                // match subscription ID to this order line item (therefore licenceID)
+                // (incase multiple subscriptions have been setup in this order)
+                foreach ($subscriptions as $subscriptionID => $subscription) {
+                    foreach ($subscription->get_items() as $subItemID => $subItem) {
+                        if ($subItemID == $itemID) {
+
+                            update_post_meta($subscriptionID, 'gnar_licence_id', $licenceID);
+
+                        }
+                    }
+                }
+            }
+
 
         }
 
@@ -235,21 +249,25 @@ class gnar_woocom {
             );
 
             $products = wc_get_products($args);
-            $product = $products[0];
 
-            // form download obj
-            $downloadObj = (object) [
-                'imageUrl'     =>  wp_get_attachment_url(get_post_thumbnail_id($product->get_id())),
-                'productName'  =>  $product->get_title(),
-                'productDesc'  =>  $product->get_description(),
-                'licenceID'    =>  $licence->licenceID,
-                'licenceKey'   =>  $licence->licenceKey,
-                'domain'       =>  $licence->domain,
-                'downloadLink' =>  gnar_download::downloadLink($licence->softwareID)
-            ];
+            if (!empty($products)) {
+                $product = $products[0];
 
-            // add to array
-            array_push($downloads, $downloadObj);
+                // form download obj
+                $downloadObj = (object) [
+                    'imageUrl'     =>  wp_get_attachment_url(get_post_thumbnail_id($product->get_id())),
+                    'productName'  =>  $product->get_title(),
+                    'productDesc'  =>  $product->get_description(),
+                    'licenceID'    =>  $licence->licenceID,
+                    'licenceKey'   =>  $licence->licenceKey,
+                    'domain'       =>  $licence->domain,
+                    'downloadLink' =>  gnar_download::downloadLink($licence->softwareID)
+                ];
+    
+                // add to array
+                array_push($downloads, $downloadObj);
+            }
+
         }
 
         return $downloads;
@@ -406,7 +424,45 @@ class gnar_woocom {
     }
 
 
+    /**
+     * Subscription status updated - update licence status
+     * 
+     * @param object $subscription
+     * @param string $newStatus
+     * @param string $oldStatus
+     * @param bool $licenceStatusChanged
+     */
+    public function subscriptionStatusUpdated($subscription, $newStatus, $oldStatus) {
 
+        // new status can be ignored
+        if ($newStatus !== 'active' && $newStatus !== 'cancelled' && $newStatus !== 'expired') {
+            return false;
+        }
+
+        // new status
+        if ($newStatus !== 'active') {
+            $licenceStatus = 'active';
+        }
+        else if ($newStatus == 'cancelled' || $newStatus == 'expired') {
+            $licenceStatus = 'inactive';
+        }
+
+        // get licence id from subscription meta
+        $subID = $subscription->get_id();
+        $licenceID = get_post_meta($subID, 'gnar_licence_id', true);
+
+        if (empty($licenceID)) {
+            return;
+        }
+
+        // update licence
+        $args = (object) [
+            'status' => $licenceStatus
+        ];
+
+        return gnar_licence::updateLicence($licenceID, $args);
+
+    }
 }
 
 
