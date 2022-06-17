@@ -17,7 +17,6 @@ class gnar_woocom {
         add_action( 'wp_ajax_updatedomain', [$this, 'ajaxUpdateDomain'] );
         add_action( 'wp_ajax_nopriv_updatedomain', [$this, 'ajaxUpdateDomain'] );
 
-
         // todo add licence key and download link to woocom email
 
         // add subscription status change hook
@@ -133,26 +132,17 @@ class gnar_woocom {
             $order->add_order_note('Gnar licence ID: ' . $licence->licenceID);
             add_post_meta($order_id, 'licence_id_' . $licence->softwareID, $licence->licenceID);
 
-            // save licence to subscription
-            $subscriptions = wcs_get_subscriptions_for_order($order_id);
+        }
 
+        // save licence to subscription (assumes only one subscription per order, and one licence per subscription)
+        $subscriptions = wcs_get_subscriptions_for_order($order_id);
 
-            if (!empty($subscriptions)) {
+        if (!empty($subscriptions)) {
 
-                // match subscription ID to this order line item (therefore licenceID)
-                // (incase multiple subscriptions have been setup in this order)
-                foreach ($subscriptions as $subscriptionID => $subscription) {
-                    foreach ($subscription->get_items() as $subItemID => $subItem) {
-                        if ($subItemID == $itemID) {
-
-                            update_post_meta($subscriptionID, 'gnar_licence_id', $licenceID);
-
-                        }
-                    }
-                }
+            foreach ($subscriptions as $subscriptionID => $subscription) {
+                update_post_meta($subscriptionID, 'gnar_licence_id', $licenceID);
+                break;
             }
-
-
         }
 
     }
@@ -434,6 +424,8 @@ class gnar_woocom {
      */
     public function subscriptionStatusUpdated($subscription, $newStatus, $oldStatus) {
 
+        echo 'sub status was updated ';
+
         // new status can be ignored
         if ($newStatus !== 'active' && $newStatus !== 'cancelled' && $newStatus !== 'expired') {
             return false;
@@ -446,6 +438,8 @@ class gnar_woocom {
         else if ($newStatus == 'cancelled' || $newStatus == 'expired') {
             $licenceStatus = 'inactive';
         }
+
+        echo 'new status is ' . $licenceStatus;
 
         // get licence id from subscription meta
         $subID = $subscription->get_id();
