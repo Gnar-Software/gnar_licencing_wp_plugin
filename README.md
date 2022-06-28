@@ -3,9 +3,10 @@
 Wordpress plugin for use on the software marketing site to create and manage software licences via the Gnar licencing API.
 
 Requires:
-    - Wordpress 5.8
-    - Woocommerce
-    - Gnar licencing API access
+
+- Wordpress 5.8
+- Woocommerce
+- Gnar licencing API access
 
 ## Features
 
